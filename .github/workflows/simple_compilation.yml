@@ -1,7 +1,7 @@
 name: Simple Compilation
 
 on:
-  pull_requests:
+  pull_request:
     branches: [ "main" ] # this is necessary to run the workflow on pull requests
   push:
     branches: [ "main" ] # this is necessary to run the workflow on pushes
