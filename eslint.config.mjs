@@ -23,6 +23,10 @@ const eslintConfig = defineConfig([
       "no-console": ["warn", { allow: ["warn", "error"] }], // Warn on console.log
       "@typescript-eslint/await-thenable": "error", // Await only Promise
       "@typescript-eslint/no-floating-promises": "error", // Handle all Promises
+      "@typescript-eslint/dot-notation": "error", // Enforce dot notation
+      "@typescript-eslint/max-params": ["error", { max: 4 }], // Max parameters per function 
+      "@typescript-eslint/prefer-optional-chain": "error", // Prefer optional chaining
+      "@typescript-eslint/prefer-nullish-coalescing": "error", // Prefer nullish coalescing
       "@typescript-eslint/naming-convention": [
         "error",
         {
