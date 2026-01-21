@@ -13,13 +13,16 @@ datasource db {
   provider = "postgresql"
 }
 
-// simple schema
+// HOW TO USE PRISMA:
 // --> every time changes are made to the schema, migrate prisma to the database:
 // npx prisma migrate dev (optional with a name like: npx prisma migrate dev --name [name])
 // npx prisma migrate deploy (when ready for deployment)
 // --> then generate the prisma client which is the bridge between the code and the database:
 // npx prisma generate
-// npx prisma studio (for a GUI to view the database)
+// --> For running the test file:
+// npx tsx src/app/prisma.ts
+// --> for a GUI to view the database:
+// npx prisma studio
 
 model User {
   // id is
