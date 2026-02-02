@@ -22,7 +22,7 @@ async function main() {
         }
     }) */
 
-    const user = await prisma.user.create({
+    /* const user = await prisma.user.create({
         data: {
             id:1230,
             age: 299,
@@ -33,7 +33,7 @@ async function main() {
             role: "BASIC",
             largeNumber: BigInt(123456789),
         }
-    })
+    }) */
     
     /* const users = await prisma.user.createMany({
         data: [{
@@ -87,7 +87,7 @@ async function main() {
         }
     }) */
     //console.log(game);
-    console.log(user);
+    //console.log(user);
 }
 
 

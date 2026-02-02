@@ -31,8 +31,8 @@ export async function registerUser({
 			email,
 			username,
 			password: hashedPassword,
-			age: 18, //need to set as optional in schema
-			largeNumber: 0 //need to set as optional in schema
+			//age: 18, //need to set as optional in schema
+			//largeNumber: 0 //need to set as optional in schema
 		},
 	})
 }
