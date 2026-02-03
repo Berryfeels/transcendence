@@ -8,6 +8,8 @@ const adapter = new PrismaPg({
 
 const prisma = new PrismaClient({ adapter })
 
+export { prisma };
+
 async function main() {
 
     console.log("Prisma running...");
@@ -20,17 +22,18 @@ async function main() {
         }
     }) */
 
-    const user = await prisma.user.create({
+    /* const user = await prisma.user.create({
         data: {
             id:1230,
             age: 299,
             email: "test@test.com",
-            name: "Test",
+            username: "Test",
+            password: "test",
             data: { hello: "world" },
             role: "BASIC",
             largeNumber: BigInt(123456789),
         }
-    })
+    }) */
     
     /* const users = await prisma.user.createMany({
         data: [{
@@ -84,7 +87,8 @@ async function main() {
         }
     }) */
     //console.log(game);
-    console.log(user);
+    //console.log(user);
 }
+
 
 main()
