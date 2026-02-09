@@ -5,14 +5,14 @@ import { useRouter } from 'next/navigation'
 
 interface UserProfile {
 	username: string
-	email: string
+	wins: number
+	losses: number
 }
 
 export default function UpdateProfilePage() {
 	const router = useRouter()
 	const [formData, setFormData] = useState({
 		username: '',
-		email: '',
 	})
 	const [isLoading, setIsLoading] = useState(true)
 	const [isSaving, setIsSaving] = useState(false)
@@ -38,8 +38,7 @@ export default function UpdateProfilePage() {
 
 				const data: UserProfile = await response.json()
 				setFormData({
-					username: data.username,
-					email: data.email,
+					username: data.username
 				})
 
 				// Get user ID from session
@@ -77,11 +76,11 @@ export default function UpdateProfilePage() {
 				body: JSON.stringify(formData),
 			})
 
-			const data = await response.json()
-
 			if (!response.ok) {
-				throw new Error(data.error || 'Failed to update profile')
+				throw new Error('Failed to update profile')
 			}
+
+			const data = await response.json()
 
 			setSuccess(true)
 
@@ -155,26 +154,6 @@ export default function UpdateProfilePage() {
 									}
 								/>
 							</div>
-
-							<div>
-								<label
-									htmlFor="email"
-									className="block text-sm font-medium text-gray-700"
-								>
-									Email
-								</label>
-								<input
-									type="email"
-									id="email"
-									required
-									className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-									value={formData.email}
-									onChange={(e) =>
-										setFormData({ ...formData, email: e.target.value })
-									}
-								/>
-							</div>
-
 							<div className="flex gap-3">
 								<button
 									type="submit"

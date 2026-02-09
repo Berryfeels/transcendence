@@ -18,8 +18,11 @@ export async function updateUserProfile(userId: string | number, data: { usernam
 	if (!userId) throw new Error("User ID is required")
 	if (!data.username || !data.email) throw new Error("Username and email are required")
 
+	const id = typeof userId === "string" ? parseInt(userId, 10) : userId
+	if (Number.isNaN(id)) throw new Error("Invalid user ID")
+
 	const updatedUser = await prisma.user.update({
-		where: { id: typeof userId === "string" ? parseInt(userId, 10) : userId },
+		where: { id },
 		data: { username: data.username, email: data.email },
 	})
 
