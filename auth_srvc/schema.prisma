@@ -69,5 +69,4 @@ enum FriendshipStatus {
   PENDING   // Friend request sent but not accepted
   ACCEPTED  // Friend request accepted (active friendship)
   BLOCKED   // User has blocked this relationship
-  REJECTED  // Friend request was rejected
 }

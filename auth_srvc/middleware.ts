@@ -12,6 +12,7 @@ export function middleware(request: NextRequest) {
 		preflight.headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization')
 		return preflight
 	}
+	
 	const response = NextResponse.next()
 
 	response.headers.set('Access-Control-Allow-Origin', origin)
