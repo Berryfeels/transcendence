@@ -23,7 +23,7 @@ export default function ProfilePage() {
 	useEffect(() => {
 		const fetchProfile = async () => {
 			try {
-				const response = await fetch(`${process.env.AUTH_SERVICE_URL}/api/profile?userId=${userId}`, {
+				const response = await fetch(`${process.env.NEXT_PUBLIC_AUTH_SERVICE_URL}/api/profile?userId=${userId}`, {
 					credentials: 'include',
 				})
 
@@ -39,7 +39,7 @@ export default function ProfilePage() {
 				const data = await response.json()
 				setProfile(data)
 
-				const sessionResponse = await fetch(`${process.env.AUTH_SERVICE_URL}/api/auth/session`, {
+				const sessionResponse = await fetch(`${process.env.NEXT_PUBLIC_AUTH_SERVICE_URL}/api/auth/session`, {
 					credentials: 'include',
 				})
 

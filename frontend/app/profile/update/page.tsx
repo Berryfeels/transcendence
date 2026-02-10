@@ -23,7 +23,7 @@ export default function UpdateProfilePage() {
 	useEffect(() => {
 		const fetchProfile = async () => {
 			try {
-				const response = await fetch(`${process.env.AUTH_SERVICE_URL}/api/profile`, {
+				const response = await fetch(`${process.env.NEXT_PUBLIC_AUTH_SERVICE_URL}/api/profile`, {
 					credentials: 'include',
 				})
 
@@ -42,7 +42,7 @@ export default function UpdateProfilePage() {
 				})
 
 				// Get user ID from session
-				const sessionResponse = await fetch(`${process.env.AUTH_SERVICE_URL}/api/auth/session`, {
+				const sessionResponse = await fetch(`${process.env.NEXT_PUBLIC_AUTH_SERVICE_URL}/api/auth/session`, {
 					credentials: 'include',
 				})
 
@@ -67,7 +67,7 @@ export default function UpdateProfilePage() {
 		setIsSaving(true)
 
 		try {
-			const response = await fetch(`${process.env.AUTH_SERVICE_URL}/api/profile/update`, {
+			const response = await fetch(`${process.env.NEXT_PUBLIC_AUTH_SERVICE_URL}/api/profile/update`, {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',
