@@ -96,7 +96,7 @@ export default function AddFriendPage() {
 
 			// Send friend request
 			const requestResponse = await fetch(
-				`${process.env.NEXT_PUBLIC_AUTH_SERVICE_URL}/api/friend/request`,
+				`${process.env.NEXT_PUBLIC_AUTH_SERVICE_URL}/api/friends/requests`,
 				{
 					method: 'POST',
 					headers: {
@@ -104,7 +104,6 @@ export default function AddFriendPage() {
 					},
 					credentials: 'include',
 					body: JSON.stringify({
-						requesterId: currentUserId,
 						addresseeId: targetUserId,
 					}),
 				}

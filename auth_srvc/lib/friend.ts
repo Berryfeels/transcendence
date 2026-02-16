@@ -97,24 +97,6 @@ export async function sendFriendRequest(
 					error: 'ALREADY_FRIENDS'
 				};
 			}
-
-			if (existingRelationship.status === FriendshipStatus.REJECTED) {
-				const updated = await prisma.friendship.update({
-					where: { id: existingRelationship.id },
-					data: {
-						requesterId,
-						addresseeId,
-						status: FriendshipStatus.PENDING,
-						updatedAt: new Date()
-					}
-				});
-
-				return {
-					success: true,
-					message: 'Friend request sent',
-					data: updated
-				};
-			}
 		}
 
 		const friendRequest = await prisma.friendship.create({
@@ -330,6 +312,59 @@ export async function rejectFriendRequest(
 		return {
 			success: false,
 			message: 'Failed to reject friend request',
+			error: 'INTERNAL_ERROR'
+		};
+	}
+}
+
+export async function blockFriendRequest(
+	friendshipId: number,
+	userId: number
+): Promise<FriendRequestResult> {
+	try {
+		const friendship = await prisma.friendship.findUnique({
+			where: { id: friendshipId }
+		});
+
+		if (!friendship) {
+			return {
+				success: false,
+				message: 'Friend request not found',
+				error: 'REQUEST_NOT_FOUND'
+			};
+		}
+
+		if (friendship.addresseeId !== userId) {
+			return {
+				success: false,
+				message: 'You are not authorized to block this request',
+				error: 'UNAUTHORIZED'
+			};
+		}
+
+		if (friendship.status !== FriendshipStatus.PENDING) {
+			return {
+				success: false,
+				message: `Cannot block request with status: ${friendship.status}`,
+				error: 'INVALID_STATUS'
+			};
+		}
+
+		const updated = await prisma.friendship.update({
+			where: { id: friendshipId },
+			data: { status: FriendshipStatus.BLOCKED }
+		});
+
+		return {
+			success: true,
+			message: 'User blocked successfully',
+			data: updated
+		};
+	} catch (error) {
+		console.error('Error blocking friend request:', error);
+		return {
+			success: false,
+			message: 'Failed to block user',
 			error: 'INTERNAL_ERROR'
 		};
 	}

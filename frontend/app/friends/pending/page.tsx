@@ -54,7 +54,7 @@ export default function PendingRequestsPage() {
 			setCurrentUserId(userId)
 
 			const response = await fetch(
-				`${process.env.NEXT_PUBLIC_AUTH_SERVICE_URL}/api/friend/pending?userId=${userId}`,
+				`${process.env.NEXT_PUBLIC_AUTH_SERVICE_URL}/api/friends/requests`,
 				{
 					credentials: 'include',
 				}
@@ -73,18 +73,18 @@ export default function PendingRequestsPage() {
 		}
 	}
 
-	const handleAccept = async (friendshipId: number, userId: number) => {
+	const handleAccept = async (friendshipId: number) => {
 		setActionLoading(friendshipId)
 		try {
 			const response = await fetch(
-				`${process.env.NEXT_PUBLIC_AUTH_SERVICE_URL}/api/friend/accept`,
+				`${process.env.NEXT_PUBLIC_AUTH_SERVICE_URL}/api/friends/requests/${friendshipId}`,
 				{
-					method: 'POST',
+					method: 'PATCH',
 					headers: {
 						'Content-Type': 'application/json',
 					},
 					credentials: 'include',
-					body: JSON.stringify({ friendshipId, userId }),
+					body: JSON.stringify({ action: 'accept' }),
 				}
 			)
 
@@ -102,18 +102,18 @@ export default function PendingRequestsPage() {
 		}
 	}
 
-	const handleReject = async (friendshipId: number, userId: number) => {
+	const handleReject = async (friendshipId: number) => {
 		setActionLoading(friendshipId)
 		try {
 			const response = await fetch(
-				`${process.env.NEXT_PUBLIC_AUTH_SERVICE_URL}/api/friend/reject`,
+				`${process.env.NEXT_PUBLIC_AUTH_SERVICE_URL}/api/friends/requests/${friendshipId}`,
 				{
-					method: 'POST',
+					method: 'PATCH',
 					headers: {
 						'Content-Type': 'application/json',
 					},
 					credentials: 'include',
-					body: JSON.stringify({ friendshipId, userId }),
+					body: JSON.stringify({ action: 'reject' }),
 				}
 			)
 
@@ -131,24 +131,22 @@ export default function PendingRequestsPage() {
 		}
 	}
 
-	const handleBlock = async (friendshipId: number, userId: number) => {
+	const handleBlock = async (friendshipId: number) => {
 		if (!confirm('Are you sure you want to block this user? They will not be able to send you friend requests.')) {
 			return
 		}
 
 		setActionLoading(friendshipId)
 		try {
-			// TODO: Implement block endpoint
-			// For now, just reject the request
 			const response = await fetch(
-				`${process.env.NEXT_PUBLIC_AUTH_SERVICE_URL}/api/friend/reject`,
+				`${process.env.NEXT_PUBLIC_AUTH_SERVICE_URL}/api/friends/requests/${friendshipId}`,
 				{
-					method: 'POST',
+					method: 'PATCH',
 					headers: {
 						'Content-Type': 'application/json',
 					},
 					credentials: 'include',
-					body: JSON.stringify({ friendshipId, userId }),
+					body: JSON.stringify({ action: 'block' }),
 				}
 			)
 
@@ -263,7 +261,7 @@ export default function PendingRequestsPage() {
 											</div>
 											<div className="flex gap-2 ml-4">
 												<button
-													onClick={() => handleAccept(request.id, request.addresseeId)}
+													onClick={() => handleAccept(request.id)}
 													disabled={actionLoading === request.id}
 													className="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed"
 												>
@@ -274,14 +272,14 @@ export default function PendingRequestsPage() {
 													)}
 												</button>
 												<button
-													onClick={() => handleReject(request.id, request.addresseeId)}
+													onClick={() => handleReject(request.id)}
 													disabled={actionLoading === request.id}
 													className="inline-flex items-center px-3 py-2 border border-gray-300 text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
 												>
 													Reject
 												</button>
 												<button
-													onClick={() => handleBlock(request.id, request.addresseeId)}
+													onClick={() => handleBlock(request.id)}
 													disabled={actionLoading === request.id}
 													className="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:opacity-50 disabled:cursor-not-allowed"
 												>

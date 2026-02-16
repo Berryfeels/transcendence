@@ -29,13 +29,14 @@ export default function ProfilePage() {
 	const [isLoading, setIsLoading] = useState(true)
 	const [error, setError] = useState('')
 	const [currentUserId, setCurrentUserId] = useState<string | null>(null)
+	const [removingFriendId, setRemovingFriendId] = useState<number | null>(null)
 
 	const userId = params.id as string
 
 	useEffect(() => {
 		const fetchProfile = async () => {
 			try {
-				const response = await fetch(`${process.env.NEXT_PUBLIC_AUTH_SERVICE_URL}/api/profile?userId=${userId}`, {
+				const response = await fetch(`${process.env.NEXT_PUBLIC_AUTH_SERVICE_URL}/api/users/${userId}`, {
 					credentials: 'include',
 				})
 
@@ -58,18 +59,21 @@ export default function ProfilePage() {
 				if (sessionResponse.ok) {
 					const sessionData = await sessionResponse.json()
 					setCurrentUserId(sessionData?.user?.id || null)
-				}
 
-				const friendsResponse = await fetch(
-					`${process.env.NEXT_PUBLIC_AUTH_SERVICE_URL}/api/friend/list?userId=${userId}`,
-					{
-						credentials: 'include',
+					// Only fetch friends if viewing own profile
+					if (sessionData?.user?.id === userId) {
+						const friendsResponse = await fetch(
+							`${process.env.NEXT_PUBLIC_AUTH_SERVICE_URL}/api/friends`,
+							{
+								credentials: 'include',
+							}
+						)
+
+						if (friendsResponse.ok) {
+							const friendsData = await friendsResponse.json()
+							setFriends(friendsData.data || [])
+						}
 					}
-				)
-
-				if (friendsResponse.ok) {
-					const friendsData = await friendsResponse.json()
-					setFriends(friendsData.data || [])
 				}
 			} catch (err) {
 				setError((err as Error).message)
@@ -82,6 +86,45 @@ export default function ProfilePage() {
 	}, [userId, router])
 
 	const isOwnProfile = currentUserId === userId
+
+	const handleRemoveFriend = async (friendId: number) => {
+		if (!confirm('Are you sure you want to remove this friend?')) {
+			return
+		}
+
+		setRemovingFriendId(friendId)
+		try {
+			const response = await fetch(
+				`${process.env.NEXT_PUBLIC_AUTH_SERVICE_URL}/api/friends/${friendId}`,
+				{
+					method: 'DELETE',
+					credentials: 'include',
+				}
+			)
+
+			if (!response.ok) {
+				const errorData = await response.json()
+				throw new Error(errorData.message || 'Failed to remove friend')
+			}
+
+			// Refresh the friends list
+			const friendsResponse = await fetch(
+				`${process.env.NEXT_PUBLIC_AUTH_SERVICE_URL}/api/friends`,
+				{
+					credentials: 'include',
+				}
+			)
+
+			if (friendsResponse.ok) {
+				const friendsData = await friendsResponse.json()
+				setFriends(friendsData.data || [])
+			}
+		} catch (err) {
+			alert((err as Error).message)
+		} finally {
+			setRemovingFriendId(null)
+		}
+	}
 
 	if (isLoading) {
 		return (
@@ -230,37 +273,69 @@ export default function ProfilePage() {
 							<ul className="divide-y divide-gray-200">
 								{friends.map((friend) => (
 									<li key={friend.id} className="px-4 py-4 hover:bg-gray-50">
-										<Link href={`/profile/${friend.id}`} className="block">
-											<div className="flex items-center justify-between">
-												<div className="flex-1 min-w-0">
-													<p className="text-sm font-medium text-indigo-600 truncate">
-														{friend.username}
-													</p>
-													<div className="mt-1 flex items-center gap-4 text-sm text-gray-500">
-														<span>Wins: {friend.wins}</span>
-														<span>Losses: {friend.losses}</span>
-														<span>Draws: {friend.draws}</span>
-														<span>Points: {friend.points}</span>
+										<div className="flex items-center justify-between gap-4">
+											<Link href={`/profile/${friend.id}`} className="flex-1 min-w-0">
+												<div className="flex items-center justify-between">
+													<div className="flex-1 min-w-0">
+														<p className="text-sm font-medium text-indigo-600 truncate">
+															{friend.username}
+														</p>
+														<div className="mt-1 flex items-center gap-4 text-sm text-gray-500">
+															<span>Wins: {friend.wins}</span>
+															<span>Losses: {friend.losses}</span>
+															<span>Draws: {friend.draws}</span>
+															<span>Points: {friend.points}</span>
+														</div>
+													</div>
+													<div>
+														<svg
+															style={{ width: '16px', height: '16px' }}
+															className="text-gray-400"
+															fill="none"
+															stroke="currentColor"
+															viewBox="0 0 24 24"
+														>
+															<path
+																strokeLinecap="round"
+																strokeLinejoin="round"
+																strokeWidth={2}
+																d="M9 5l7 7-7 7"
+															/>
+														</svg>
 													</div>
 												</div>
-												<div>
-													<svg
-														style={{ width: '16px', height: '16px' }}
-														className="text-gray-400"
-														fill="none"
-														stroke="currentColor"
-														viewBox="0 0 24 24"
-													>
-														<path
-															strokeLinecap="round"
-															strokeLinejoin="round"
-															strokeWidth={2}
-															d="M9 5l7 7-7 7"
-														/>
-													</svg>
-												</div>
-											</div>
-										</Link>
+											</Link>
+											{isOwnProfile && (
+												<button
+													onClick={(e) => {
+														e.preventDefault()
+														handleRemoveFriend(friend.id)
+													}}
+													disabled={removingFriendId === friend.id}
+													className="flex-shrink-0 inline-flex items-center px-3 py-1.5 border border-red-300 text-xs font-medium rounded text-red-700 bg-white hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:opacity-50 disabled:cursor-not-allowed"
+													title="Remove friend"
+												>
+													{removingFriendId === friend.id ? (
+														<div className="animate-spin rounded-full h-3 w-3 border-b-2 border-red-600"></div>
+													) : (
+														<svg
+															style={{ width: '14px', height: '14px' }}
+															fill="none"
+															stroke="currentColor"
+															viewBox="0 0 24 24"
+														>
+															<path
+																strokeLinecap="round"
+																strokeLinejoin="round"
+																strokeWidth={2}
+																d="M6 18L18 6M6 6l12 12"
+															/>
+														</svg>
+													)}
+													<span className="ml-1">Remove</span>
+												</button>
+											)}
+										</div>
 									</li>
 								))}
 							</ul>

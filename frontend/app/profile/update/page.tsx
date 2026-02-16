@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 
 interface UserProfile {
 	username: string
+	email?: string
 	wins: number
 	losses: number
 }
@@ -13,6 +14,7 @@ export default function UpdateProfilePage() {
 	const router = useRouter()
 	const [formData, setFormData] = useState({
 		username: '',
+		email: '',
 	})
 	const [isLoading, setIsLoading] = useState(true)
 	const [isSaving, setIsSaving] = useState(false)
@@ -23,7 +25,7 @@ export default function UpdateProfilePage() {
 	useEffect(() => {
 		const fetchProfile = async () => {
 			try {
-				const response = await fetch(`${process.env.NEXT_PUBLIC_AUTH_SERVICE_URL}/api/profile`, {
+				const response = await fetch(`${process.env.NEXT_PUBLIC_AUTH_SERVICE_URL}/api/users/me`, {
 					credentials: 'include',
 				})
 
@@ -37,19 +39,24 @@ export default function UpdateProfilePage() {
 				}
 
 				const data: UserProfile = await response.json()
-				setFormData({
-					username: data.username
-				})
 
-				// Get user ID from session
+				// Get user email from session since getUserById doesn't return it
 				const sessionResponse = await fetch(`${process.env.NEXT_PUBLIC_AUTH_SERVICE_URL}/api/auth/session`, {
 					credentials: 'include',
 				})
 
+				let email = ''
 				if (sessionResponse.ok) {
 					const sessionData = await sessionResponse.json()
 					setUserId(sessionData?.user?.id || null)
+					email = sessionData?.user?.email || ''
 				}
+
+				setFormData({
+					username: data.username,
+					email: email
+				})
+
 			} catch (err) {
 				setError((err as Error).message)
 			} finally {
@@ -67,8 +74,8 @@ export default function UpdateProfilePage() {
 		setIsSaving(true)
 
 		try {
-			const response = await fetch(`${process.env.NEXT_PUBLIC_AUTH_SERVICE_URL}/api/profile/update`, {
-				method: 'POST',
+			const response = await fetch(`${process.env.NEXT_PUBLIC_AUTH_SERVICE_URL}/api/users/me`, {
+				method: 'PATCH',
 				headers: {
 					'Content-Type': 'application/json',
 				},
@@ -151,6 +158,25 @@ export default function UpdateProfilePage() {
 									value={formData.username}
 									onChange={(e) =>
 										setFormData({ ...formData, username: e.target.value })
+									}
+								/>
+							</div>
+
+							<div>
+								<label
+									htmlFor="email"
+									className="block text-sm font-medium text-gray-700"
+								>
+									Email
+								</label>
+								<input
+									type="email"
+									id="email"
+									required
+									className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+									value={formData.email}
+									onChange={(e) =>
+										setFormData({ ...formData, email: e.target.value })
 									}
 								/>
 							</div>
