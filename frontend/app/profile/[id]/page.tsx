@@ -8,12 +8,24 @@ interface UserProfile {
 	username: string
 	wins: number
 	losses: number
+	draws: number
+	points: number
+}
+
+interface Friend {
+	id: number
+	username: string
+	wins: number
+	losses: number
+	draws: number
+	points: number
 }
 
 export default function ProfilePage() {
 	const params = useParams()
 	const router = useRouter()
 	const [profile, setProfile] = useState<UserProfile | null>(null)
+	const [friends, setFriends] = useState<Friend[]>([])
 	const [isLoading, setIsLoading] = useState(true)
 	const [error, setError] = useState('')
 	const [currentUserId, setCurrentUserId] = useState<string | null>(null)
@@ -46,6 +58,18 @@ export default function ProfilePage() {
 				if (sessionResponse.ok) {
 					const sessionData = await sessionResponse.json()
 					setCurrentUserId(sessionData?.user?.id || null)
+				}
+
+				const friendsResponse = await fetch(
+					`${process.env.NEXT_PUBLIC_AUTH_SERVICE_URL}/api/friend/list?userId=${userId}`,
+					{
+						credentials: 'include',
+					}
+				)
+
+				if (friendsResponse.ok) {
+					const friendsData = await friendsResponse.json()
+					setFriends(friendsData.data || [])
 				}
 			} catch (err) {
 				setError((err as Error).message)
@@ -100,7 +124,7 @@ export default function ProfilePage() {
 
 	return (
 		<div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-			<div className="max-w-3xl mx-auto">
+			<div className="max-w-3xl mx-auto space-y-6">
 				<div className="bg-white shadow overflow-hidden sm:rounded-lg">
 					<div className="px-4 py-5 sm:px-6 flex justify-between items-center">
 						<div>
@@ -134,13 +158,113 @@ export default function ProfilePage() {
 									{profile.wins}
 								</dd>
 							</div>
-							<div className="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+							<div className="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
 								<dt className="text-sm font-medium text-gray-500">Losses</dt>
 								<dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
 									{profile.losses}
 								</dd>
 							</div>
+							<div className="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+								<dt className="text-sm font-medium text-gray-500">Draws</dt>
+								<dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+									{profile.draws}
+								</dd>
+							</div>
+							<div className="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+								<dt className="text-sm font-medium text-gray-500">Points</dt>
+								<dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+									{profile.points}
+								</dd>
+							</div>
 						</dl>
+					</div>
+				</div>
+
+				{isOwnProfile && (
+					<div className="bg-white shadow sm:rounded-lg p-6">
+						<div className="flex flex-col sm:flex-row gap-4">
+							<Link
+								href="/friends/pending"
+								className="flex-1 inline-flex justify-center items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+							>
+								<svg style={{ width: '16px', height: '16px' }} className="mr-2 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+									<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+								</svg>
+								View Pending Requests
+							</Link>
+							<Link
+								href="/friends/add"
+								className="flex-1 inline-flex justify-center items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+							>
+								<svg style={{ width: '16px', height: '16px' }} className="mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+									<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+								</svg>
+								Add New Friend
+							</Link>
+						</div>
+					</div>
+				)}
+
+				<div className="bg-white shadow overflow-hidden sm:rounded-lg">
+					<div className="px-4 py-5 sm:px-6">
+						<h3 className="text-lg leading-6 font-medium text-gray-900">
+							Friends ({friends.length})
+						</h3>
+					</div>
+					<div className="border-t border-gray-200">
+						{friends.length === 0 ? (
+							<div className="px-4 py-12 text-center">
+								<p className="mt-2 text-sm text-gray-500">
+									{isOwnProfile ? 'You don\'t have any friends yet' : 'No friends to display'}
+								</p>
+								{isOwnProfile && (
+									<Link
+										href="/friends/add"
+										className="mt-4 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-indigo-700 bg-indigo-100 hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+									>
+										Add your first friend
+									</Link>
+								)}
+							</div>
+						) : (
+							<ul className="divide-y divide-gray-200">
+								{friends.map((friend) => (
+									<li key={friend.id} className="px-4 py-4 hover:bg-gray-50">
+										<Link href={`/profile/${friend.id}`} className="block">
+											<div className="flex items-center justify-between">
+												<div className="flex-1 min-w-0">
+													<p className="text-sm font-medium text-indigo-600 truncate">
+														{friend.username}
+													</p>
+													<div className="mt-1 flex items-center gap-4 text-sm text-gray-500">
+														<span>Wins: {friend.wins}</span>
+														<span>Losses: {friend.losses}</span>
+														<span>Draws: {friend.draws}</span>
+														<span>Points: {friend.points}</span>
+													</div>
+												</div>
+												<div>
+													<svg
+														style={{ width: '16px', height: '16px' }}
+														className="text-gray-400"
+														fill="none"
+														stroke="currentColor"
+														viewBox="0 0 24 24"
+													>
+														<path
+															strokeLinecap="round"
+															strokeLinejoin="round"
+															strokeWidth={2}
+															d="M9 5l7 7-7 7"
+														/>
+													</svg>
+												</div>
+											</div>
+										</Link>
+									</li>
+								))}
+							</ul>
+						)}
 					</div>
 				</div>
 			</div>
