@@ -50,6 +50,8 @@ export default function UpdateProfilePage() {
 					const sessionData = await sessionResponse.json()
 					setUserId(sessionData?.user?.id || null)
 					email = sessionData?.user?.email || ''
+				} else {
+					throw new Error('Failed to load session data')
 				}
 
 				setFormData({

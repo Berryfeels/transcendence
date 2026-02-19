@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { requireAuthWithUserId } from '@/lib/middleware/auth';
 import { removeFriendship } from '@/lib/friend';
 import { handleApiError } from '@/lib/utils/api-response';
-import { validateFriendshipId } from '@/lib/utils/validation';
+import { parseIdParam } from '@/lib/utils/validation';
 import { getStatusCode } from '@/lib/utils/error-codes';
 
 export const dynamic = 'force-dynamic';
@@ -14,7 +14,7 @@ export async function DELETE(
 	try {
 		const { userId } = await requireAuthWithUserId();
 		const { id } = await params;
-		const friendId = validateFriendshipId(id);
+		const friendId = parseIdParam(id);
 
 		const result = await removeFriendship(userId, friendId);
 

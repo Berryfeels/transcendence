@@ -1,5 +1,5 @@
 import { prisma } from "../prisma/prisma";
-import { FriendshipStatus } from '@prisma/client';
+import { FriendshipStatus, Prisma } from '@prisma/client';
 
 export interface FriendRequest {
 	id: number;
@@ -99,19 +99,39 @@ export async function sendFriendRequest(
 			}
 		}
 
-		const friendRequest = await prisma.friendship.create({
-			data: {
-				requesterId,
-				addresseeId,
-				status: FriendshipStatus.PENDING
-			}
-		});
+		try {
+			const friendRequest = await prisma.friendship.create({
+				data: {
+					requesterId,
+					addresseeId,
+					status: FriendshipStatus.PENDING
+				}
+			});
 
-		return {
-			success: true,
-			message: 'Friend request sent successfully',
-			data: friendRequest
-		};
+			return {
+				success: true,
+				message: 'Friend request sent successfully',
+				data: friendRequest
+			};
+		} catch (e) {
+			if (!(e instanceof Prisma.PrismaClientKnownRequestError && e.code === 'P2002')) throw e;
+
+			const race = await prisma.friendship.findFirst({
+				where: {
+					OR: [
+						{ requesterId, addresseeId },
+						{ requesterId: addresseeId, addresseeId: requesterId }
+					]
+				}
+			});
+
+			if (race?.status === FriendshipStatus.BLOCKED)
+				return { success: false, message: 'Cannot send friend request due to blocked relationship', error: 'RELATIONSHIP_BLOCKED' };
+			if (race?.status === FriendshipStatus.ACCEPTED)
+				return { success: false, message: 'Already friends', error: 'ALREADY_FRIENDS' };
+
+			return { success: false, message: 'Friend request already pending', error: 'REQUEST_ALREADY_PENDING' };
+		}
 	} catch (error) {
 		console.error('Error sending friend request:', error);
 		return {
@@ -133,8 +153,7 @@ export async function getPendingRequests(userId: number) {
 				requester: {
 					select: {
 						id: true,
-						username: true,
-						email: true
+						username: true
 					}
 				}
 			},
@@ -172,7 +191,6 @@ export async function getFriends(userId: number) {
 					select: {
 						id: true,
 						username: true,
-						email: true,
 						wins: true,
 						losses: true,
 						draws: true,
@@ -183,7 +201,6 @@ export async function getFriends(userId: number) {
 					select: {
 						id: true,
 						username: true,
-						email: true,
 						wins: true,
 						losses: true,
 						draws: true,

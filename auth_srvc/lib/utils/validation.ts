@@ -17,15 +17,15 @@ export function validateAndParseUserId(userId: string | number): number {
 }
 
 /**
- * Validates and parses a friendship ID from string format
- * @throws {Error} If friendshipId is invalid
+ * Parses a numeric ID from a URL path parameter string
+ * @throws {Error} If the value is not a valid integer
  */
-export function validateFriendshipId(id: string): number {
-	const friendshipId = parseInt(id);
-	if (isNaN(friendshipId)) {
-		throw new Error('Invalid friendship ID');
+export function parseIdParam(id: string): number {
+	const parsed = parseInt(id, 10);
+	if (isNaN(parsed)) {
+		throw new Error('Invalid ID');
 	}
-	return friendshipId;
+	return parsed;
 }
 
 /**

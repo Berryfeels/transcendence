@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { requireAuthWithUserId } from '@/lib/middleware/auth';
 import { acceptFriendRequest, rejectFriendRequest, blockFriendRequest } from '@/lib/friend';
 import { handleApiError, errorResponse } from '@/lib/utils/api-response';
-import { validateFriendshipId } from '@/lib/utils/validation';
+import { parseIdParam } from '@/lib/utils/validation';
 import { getStatusCode } from '@/lib/utils/error-codes';
 
 export const dynamic = 'force-dynamic';
@@ -14,7 +14,7 @@ export async function PATCH(
 	try {
 		const { userId } = await requireAuthWithUserId();
 		const { id } = await params;
-		const friendshipId = validateFriendshipId(id);
+		const friendshipId = parseIdParam(id);
 
 		const body = await req.json();
 		const { action } = body;

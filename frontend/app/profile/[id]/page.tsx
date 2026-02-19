@@ -61,7 +61,7 @@ export default function ProfilePage() {
 					setCurrentUserId(sessionData?.user?.id || null)
 
 					// Only fetch friends if viewing own profile
-					if (sessionData?.user?.id === userId) {
+					if (String(sessionData?.user?.id) === userId) {
 						const friendsResponse = await fetch(
 							`${process.env.NEXT_PUBLIC_AUTH_SERVICE_URL}/api/friends`,
 							{
@@ -248,7 +248,7 @@ export default function ProfilePage() {
 					</div>
 				)}
 
-				<div className="bg-white shadow overflow-hidden sm:rounded-lg">
+				{isOwnProfile && <div className="bg-white shadow overflow-hidden sm:rounded-lg">
 					<div className="px-4 py-5 sm:px-6">
 						<h3 className="text-lg leading-6 font-medium text-gray-900">
 							Friends ({friends.length})
@@ -341,7 +341,7 @@ export default function ProfilePage() {
 							</ul>
 						)}
 					</div>
-				</div>
+				</div>}
 			</div>
 		</div>
 	)

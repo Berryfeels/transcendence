@@ -254,8 +254,7 @@ export default function PendingRequestsPage() {
 												>
 													{request.requester.username}
 												</Link>
-												<p className="text-sm text-gray-500">{request.requester.email}</p>
-												<p className="text-xs text-gray-400 mt-1">
+		<p className="text-xs text-gray-400 mt-1">
 													Sent {new Date(request.createdAt).toLocaleDateString()}
 												</p>
 											</div>

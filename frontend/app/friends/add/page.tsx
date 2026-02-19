@@ -89,7 +89,7 @@ export default function AddFriendPage() {
 			const userData = await searchResponse.json()
 			const targetUserId = userData.id
 
-			if (targetUserId === currentUserId) {
+			if (String(targetUserId) === String(currentUserId)) {
 				setError('You cannot send a friend request to yourself')
 				return
 			}
