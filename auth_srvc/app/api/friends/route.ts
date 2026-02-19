@@ -1,4 +1,4 @@
-import { requireAuthWithUserId } from '@/lib/middleware/auth';
+import { requireAuthWithUserId } from '@/lib/proxy/auth';
 import { getFriends } from '@/lib/friend';
 import { handleApiError, successResponse } from '@/lib/utils/api-response';
 

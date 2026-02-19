@@ -17,37 +17,20 @@ export interface FriendRequestResult {
 	error?: string;
 }
 
-export async function sendFriendRequest(
-	requesterId: number,
-	addresseeId: number
-): Promise<FriendRequestResult> {
+/*
+The whole function is wrapped in a try/catch to send the client a non-descript error, while the actual error is logged in the console for the backend
+
+The P2002 error code below indicates a unique constraint violation. It could happen that user A & B send a friend request to the other at the same time.
+Since that request doesn't exist yet, both flow would try to create a new one, leading to a race condition. One of the two request would succeed, but the other would fail.
+In order to catch the right error reason (instead of the non-descript "internat error"), we look again for the friendship and then log the right error
+*/
+export async function sendFriendRequest(requesterId: number, addresseeId: number): Promise<FriendRequestResult> {
 	try {
 		if (requesterId === addresseeId) {
 			return {
 				success: false,
 				message: 'Cannot send friend request to yourself',
 				error: 'INVALID_SELF_REQUEST'
-			};
-		}
-
-		const [requester, addressee] = await Promise.all([
-			prisma.user.findUnique({ where: { id: requesterId } }),
-			prisma.user.findUnique({ where: { id: addresseeId } })
-		]);
-
-		if (!requester || !requester.isActive) {
-			return {
-				success: false,
-				message: 'Requester not found or inactive',
-				error: 'REQUESTER_NOT_FOUND'
-			};
-		}
-
-		if (!addressee || !addressee.isActive) {
-			return {
-				success: false,
-				message: 'User not found or inactive',
-				error: 'ADDRESSEE_NOT_FOUND'
 			};
 		}
 
@@ -142,6 +125,7 @@ export async function sendFriendRequest(
 	}
 }
 
+/* This function is used on the profile page of a user, to see his current pending requests */
 export async function getPendingRequests(userId: number) {
 	try {
 		const requests = await prisma.friendship.findMany({
@@ -176,6 +160,7 @@ export async function getPendingRequests(userId: number) {
 	}
 }
 
+/* This function is also used on the profile page, for the user to see his friends */
 export async function getFriends(userId: number) {
 	try {
 		const friendships = await prisma.friendship.findMany({
@@ -230,6 +215,10 @@ export async function getFriends(userId: number) {
 	}
 }
 
+/*
+Similar to the sendFriendRequest function above, this is wrapped in a try/catch so that the error code is 
+logged in the console but not sent to the client
+*/
 export async function acceptFriendRequest(
 	friendshipId: number,
 	userId: number
@@ -283,6 +272,7 @@ export async function acceptFriendRequest(
 	}
 }
 
+/* Same as above */
 export async function rejectFriendRequest(
 	friendshipId: number,
 	userId: number
@@ -334,6 +324,7 @@ export async function rejectFriendRequest(
 	}
 }
 
+/* Again same */
 export async function blockFriendRequest(
 	friendshipId: number,
 	userId: number
@@ -387,6 +378,7 @@ export async function blockFriendRequest(
 	}
 }
 
+/* Same as above */
 export async function removeFriendship(
 	userId: number,
 	friendId: number

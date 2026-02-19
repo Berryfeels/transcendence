@@ -1,7 +1,4 @@
-/**
- * Validates and parses a user ID from string or number format
- * @throws {Error} If userId is missing or invalid
- */
+/* Validates and parses a user ID from string or number format */
 export function validateAndParseUserId(userId: string | number): number {
 	if (!userId) {
 		throw new Error('User ID is required');
@@ -16,10 +13,7 @@ export function validateAndParseUserId(userId: string | number): number {
 	return id;
 }
 
-/**
- * Parses a numeric ID from a URL path parameter string
- * @throws {Error} If the value is not a valid integer
- */
+/* Parses a numeric ID from a URL path parameter string */
 export function parseIdParam(id: string): number {
 	const parsed = parseInt(id, 10);
 	if (isNaN(parsed)) {
@@ -28,10 +22,7 @@ export function parseIdParam(id: string): number {
 	return parsed;
 }
 
-/**
- * Validates an addressee ID from request body
- * @throws {Error} If addresseeId is missing or invalid type
- */
+/* Validates an addressee ID from request body */
 export function validateAddresseeId(addresseeId: unknown): number {
 	if (!addresseeId) {
 		throw new Error('addresseeId is required');

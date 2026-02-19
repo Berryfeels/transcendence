@@ -1,6 +1,6 @@
-import { NextRequest } from 'next/server';
-import { requireAuthWithUserId } from '@/lib/middleware/auth';
-import { getUserById, updateUserProfile } from '@/lib/profile';
+import { NextRequest, NextResponse } from 'next/server';
+import { requireAuthWithUserId } from '@/lib/proxy/auth';
+import { getUserById, updateUserProfile, deleteUserAccount } from '@/lib/profile';
 import { handleApiError, successResponse, errorResponse } from '@/lib/utils/api-response';
 
 export const dynamic = 'force-dynamic';
@@ -15,6 +15,16 @@ export async function GET() {
 		}
 
 		return successResponse(user);
+	} catch (error) {
+		return handleApiError(error);
+	}
+}
+
+export async function DELETE() {
+	try {
+		const { userId } = await requireAuthWithUserId();
+		await deleteUserAccount(userId);
+		return NextResponse.json({ success: true, message: 'Account deleted' });
 	} catch (error) {
 		return handleApiError(error);
 	}

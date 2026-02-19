@@ -1,5 +1,5 @@
 import { NextRequest } from 'next/server';
-import { requireAuth } from '@/lib/middleware/auth';
+import { requireAuth } from '@/lib/proxy/auth';
 import { getUserByUsername } from '@/lib/profile';
 import { handleApiError, successResponse, errorResponse } from '@/lib/utils/api-response';
 

@@ -1,8 +1,6 @@
 import { NextResponse } from 'next/server';
 
-/**
- * Custom error class for unauthorized access
- */
+/* Custom error class for unauthorized access */
 export class UnauthorizedError extends Error {
 	constructor(message = 'Not authenticated') {
 		super(message);
@@ -10,14 +8,13 @@ export class UnauthorizedError extends Error {
 	}
 }
 
-/**
- * Handles API errors consistently across all routes
- * Maps different error types to appropriate HTTP status codes
- */
+/*
+Handles API errors consistently across all routes
+Maps different error types to appropriate HTTP status codes
+*/
 export function handleApiError(error: unknown) {
 	console.error('API Error:', error);
 
-	// Handle unauthorized errors
 	if (error instanceof UnauthorizedError) {
 		return NextResponse.json(
 			{ error: error.message },
@@ -25,7 +22,6 @@ export function handleApiError(error: unknown) {
 		);
 	}
 
-	// Handle standard errors with message-based status codes
 	if (error instanceof Error) {
 		const message = error.message;
 
@@ -54,14 +50,12 @@ export function handleApiError(error: unknown) {
 			);
 		}
 
-		// Return the error message with 500 for unhandled cases
 		return NextResponse.json(
 			{ error: message },
 			{ status: 500 }
 		);
 	}
 
-	// Generic fallback for unknown errors
 	return NextResponse.json(
 		{ error: 'Internal server error' },
 		{ status: 500 }

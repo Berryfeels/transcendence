@@ -1,7 +1,7 @@
-/**
- * Centralized error code to HTTP status code mapping
- * Used by friend request operations
- */
+/*
+Centralized error code to HTTP status code mapping
+Used by friend request operations
+*/
 
 export const ERROR_STATUS_MAP: Record<string, number> = {
 	// Friend request errors

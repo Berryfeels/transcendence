@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { requireAuthWithUserId } from '@/lib/middleware/auth';
+import { requireAuthWithUserId } from '@/lib/proxy/auth';
 import { acceptFriendRequest, rejectFriendRequest, blockFriendRequest } from '@/lib/friend';
 import { handleApiError, errorResponse } from '@/lib/utils/api-response';
 import { parseIdParam } from '@/lib/utils/validation';

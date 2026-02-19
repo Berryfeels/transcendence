@@ -1,6 +1,7 @@
 import { prisma } from "../prisma/prisma";
 import { validateAndParseUserId } from "./utils/validation";
 
+/* This doesn't return the email for privacy reasons, and also returns the stats but we could change that */
 export async function getUserById(userId: string | number) {
 	const id = validateAndParseUserId(userId);
 
@@ -12,6 +13,7 @@ export async function getUserById(userId: string | number) {
 	return user
 }
 
+/* Same here */
 export async function getUserByUsername(username: string) {
 	if (!username) throw new Error("Username is required")
 
@@ -20,16 +22,18 @@ export async function getUserByUsername(username: string) {
 		select: {
 			id: true,
 			username: true,
-			email: true,
-			isActive: true
 		},
 	})
 
-	if (!user || !user.isActive) {
+	if (!user) {
 		return null
 	}
 
 	return user
+}
+
+export async function deleteUserAccount(userId: number): Promise<void> {
+	await prisma.user.delete({ where: { id: userId } });
 }
 
 export async function updateUserProfile(userId: string | number, data: { username: string; email: string }) {
