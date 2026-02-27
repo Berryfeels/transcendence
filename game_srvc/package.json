@@ -1,4 +1,13 @@
 {
+  "Comments": [
+    "run this command only once to generate a package.json file to begin a project: npm init -f",
+    "package.json is the configuring file used by npm and only npm",
+    "npm will not only install dependencies but update the package.json",
+    "each time npm install <library> is runed",
+    "DevDependencies are installed for typescript to check on the code for errors,",
+    "this is why it is utilised during development but not during production",
+    "in fact npm ci (check Dockerfile) won't install devDependencies while npm install will"
+  ],
   "name": "game-service",
   "version": "1.0.0",
   "description": "Game Server Orchestration Service",
@@ -13,17 +22,29 @@
     "prisma:studio": "prisma studio"
   },
   "dependencies": {
+    "@prisma/client": "^5.8.0",
+    "axios": "^1.13.5",
+    "datauri": "^4.1.0",
+    "dockerode": "^4.0.0",
+    "express": "^5.2.1",
+    "jsdom": "^28.1.0",
     "next": "^14.2.0",
+    "phaser": "^3.90.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "@prisma/client": "^5.8.0",
-    "dockerode": "^4.0.0"
+    "socket.io": "^4.8.3"
   },
   "devDependencies": {
+    "@types/dockerode": "^3.3.23",
+    "@types/express": "^5.0.6",
     "@types/node": "^20",
     "@types/react": "^18",
-    "@types/dockerode": "^3.3.23",
     "prisma": "^5.8.0",
     "typescript": "^5"
-  }
+  },
+  "main": "next.config.js",
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs"
 }

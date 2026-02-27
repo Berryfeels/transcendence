@@ -11,6 +11,7 @@ RUN npm ci
 # Copy application code
 COPY . .
 
+
 # Expose port
 EXPOSE 3002
 
