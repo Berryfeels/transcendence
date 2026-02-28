@@ -16,4 +16,4 @@ COPY . .
 EXPOSE 3002
 
 # Start the dev server (skip Prisma for now)
-CMD ["npm", "run", "dev"]
+CMD ["node", "server.js"]
