@@ -95,22 +95,22 @@ services:
   # Frontend
   # 
   #
-  frontend:
-    build: ./frontend
-    container_name: frontend_service
-    ports:
-      - "3003:3003"
-    environment:
-      - AUTH_SERVICE_URL=http://auth_srvc:3000
-      - NEXT_PUBLIC_AUTH_SERVICE_URL=http://localhost:3000
-      - CHAT_SERVICE_URL=http://chat_srvc:3001
-      - NEXT_PUBLIC_CHAT_SERVICE_URL=http://localhost:3001
-      - NODE_ENV=development
-    depends_on:
-      - auth_srvc
-      - chat_srvc
-    networks:
-      - app_network
+  # frontend:
+  #   build: ./frontend
+  #   container_name: frontend_service
+  #   ports:
+  #     - "3003:3003"
+  #   environment:
+  #     - AUTH_SERVICE_URL=http://auth_srvc:3000
+  #     - NEXT_PUBLIC_AUTH_SERVICE_URL=http://localhost:3000
+  #     - CHAT_SERVICE_URL=http://chat_srvc:3001
+  #     - NEXT_PUBLIC_CHAT_SERVICE_URL=http://localhost:3001
+  #     - NODE_ENV=development
+  #   depends_on:
+  #     - auth_srvc
+  #     - chat_srvc
+  #   networks:
+  #     - app_network
 
   # Game Service - Serves games from public/games/
   game_srvc:
@@ -120,10 +120,14 @@ services:
       - "3002:3002"
     environment:
       - DATABASE_URL=postgresql://postgres:password@postgres:5432/game_db
+      - AUTH_SERVICE_URL=http://auth_srvc:3000
+      - SERVICE_SECRET=inter-service-shared-secret-change-in-production
       - NODE_ENV=development
     depends_on:
       postgres:
         condition: service_healthy
+      auth_srvc:
+        condition: service_started
     networks:
       - app_network
     restart: unless-stopped
